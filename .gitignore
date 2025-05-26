@@ -5,3 +5,4 @@ libft/*/*.o
 libft/*/*/*.o
 .make_submodules
 .mandatory
+.cache

@@ -6,7 +6,7 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:18:02 by samusanc          #+#    #+#             */
-/*   Updated: 2025/05/26 15:31:05 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/05/26 16:24:50 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,18 @@ t_ip	*new_ip(char *ip)
 	return (result);
 }
 
-int	verify_hostnames(char *str, t_flags)
+int	check_number(char *str)
+{
+	return (0);
+
+}
+
+int	check_pad(char *str)
+{
+	return (0);
+}
+
+int	verify_hostnames(char *str, t_flags *flags)
 {
 	static int	toogled = 0;
 	static char	last_flag = '\0';
@@ -76,8 +87,73 @@ int	verify_hostnames(char *str, t_flags)
 	}
 	if (toogled)
 	{
-		if (last_flag == '')
-
+		if (last_flag == 'c')
+		{
+			if (check_number(str))
+			{
+				flags->number = atoi(str);
+				return (2);
+			}
+			else
+			{
+				flags->error = 1;
+				return (-1);
+			}
+		}
+		if (last_flag == 'w')
+		{
+			if (check_number(str))
+			{
+				flags->deadline = atoi(str);
+				return (2);
+			}
+			else
+			{
+				flags->error = 1;
+				return (-1);
+			}
+		}
+		if (last_flag == 'W')
+		{
+			if (check_number(str))
+			{
+				flags->timeout = atoi(str);
+				return (2);
+			}
+			else
+			{
+				flags->error = 1;
+				return (-1);
+			}
+		}
+		if (last_flag == 'i')
+		{
+			if (check_number(str))
+			{
+				flags->interval = atoi(str);
+				return (2);
+			}
+			else
+			{
+				flags->error = 1;
+				return (-1);
+			}
+		}
+		if (last_flag == 'p')
+		{
+			if (check_pad(str))
+			{
+				if (flags->pad)
+					free(flags->pad);
+				flags->pad = strdup(str);
+				return (2);
+			}
+			else
+			{
+				flags->error = 1;
+				return (-1);
+			}
+		}
 	}
 	return (0);
 }

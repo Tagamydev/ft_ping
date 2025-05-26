@@ -6,7 +6,7 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:54:32 by samusanc          #+#    #+#             */
-/*   Updated: 2025/05/26 15:49:12 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/05/26 16:13:45 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,17 +57,16 @@ Timeout for each reply (how long to wait for a response).
 	char	*pad;
 
 
+// yeahhhhhhhhhhhhhhhh
 	int q;
-/*
--n (numeric output only)
-Disable DNS lookup for hosts.
-→ Just avoid gethostbyaddr() or similar when printing IP.
-*/
-	int n;
 
 	//?
 	int i;
 	int	interval;
+
+	int v;
+	int help;
+
 	int	total;
 	int	error;
 } t_flags;

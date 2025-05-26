@@ -6,7 +6,7 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:18:02 by samusanc          #+#    #+#             */
-/*   Updated: 2025/05/26 14:55:02 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/05/26 15:31:05 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,26 @@ t_ip	*new_ip(char *ip)
 	return (result);
 }
 
+int	verify_hostnames(char *str, t_flags)
+{
+	static int	toogled = 0;
+	static char	last_flag = '\0';
+
+	if (!strcmp(str, "-n") || !strcmp(str, "-?") || !strcmp(str, "-v"))
+		return (1);
+	else if (str[0] == '-')
+	{
+		toogled = 1;
+		return (1);
+	}
+	if (toogled)
+	{
+		if (last_flag == '')
+
+	}
+	return (0);
+}
+
 t_ping	*init_ping(char **argv)
 {
 	t_ping	*result = NULL;
@@ -73,6 +93,7 @@ t_ping	*init_ping(char **argv)
 	bzero(result, sizeof(t_ping));
 	while(argv[i])
 	{
+		// this need to be changed, because of the flags
 		if (argv[i][0] != '-')
 			list_push_b(&result->ips, node(new_ip(argv[i]), free_ip));
 		i++;
@@ -83,9 +104,11 @@ t_ping	*init_ping(char **argv)
 
 void	print_ping_result(t_ip *ip)
 {
+	if (!ip)
+		return ;
 	printf("--- 172.0.0.21 ping statistics ---\n");
 	printf("4 packets transmitted, 0 packets received, 100%% packet loss\n");
-	if (!ip->packets_received)
+	if (ip->packets_transmitted)
 		printf("round-trip min/avg/max/stddev = 0,102/0,113/0,126/0,000 ms\n");
 }
 

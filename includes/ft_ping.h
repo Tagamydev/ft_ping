@@ -6,7 +6,7 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:54:32 by samusanc          #+#    #+#             */
-/*   Updated: 2025/05/26 13:42:03 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/05/26 15:49:12 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,23 +35,29 @@ typedef struct s_flags{
 /*-c (count)
 Stop sending pings after N requests.
 → Just use a counter. Easy logic around loop iteration.*/
-	int c;
+	int		c;
+	size_t	number;
 
 /*-w (deadline)
 Exit after N seconds, regardless of how many pings sent.
 → Track elapsed time with gettimeofday() or clock_gettime().*/
-	int w;
+	int		w;
+	size_t	deadline;
 
 /*-W (timeout for reply)
 Timeout for each reply (how long to wait for a response).
 → Set recvfrom() timeout with setsockopt() using SO_RCVTIMEO.*/
 	int W;
+	size_t	timeout;
 
-/*-p (interval or pattern)
--p (custom pattern in payload) is easier than interval handling.
-→ Just copy a byte pattern into the ICMP payload buffer.*/
-	int p;
+/* You may specify up to 16 "pad" bytes to fill out the packet you send.  This is useful for diagnosing data-dependent problems in a network.  For exam‐
+ ple, “-p ff” will cause the sent packet to be filled with all ones.*/
+	int	p;
+	// how can i verify this???
+	char	*pad;
 
+
+	int q;
 /*
 -n (numeric output only)
 Disable DNS lookup for hosts.
@@ -61,6 +67,7 @@ Disable DNS lookup for hosts.
 
 	//?
 	int i;
+	int	interval;
 	int	total;
 	int	error;
 } t_flags;

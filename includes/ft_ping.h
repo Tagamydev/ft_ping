@@ -6,7 +6,7 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:54:32 by samusanc          #+#    #+#             */
-/*   Updated: 2025/05/26 08:03:26 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/05/26 13:42:03 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,36 @@ typedef	struct s_header{
 }	t_header;
 
 typedef struct s_flags{
-	int	a;
-	int g;
-	int u;
-	int	r;
+
+/*-c (count)
+Stop sending pings after N requests.
+→ Just use a counter. Easy logic around loop iteration.*/
+	int c;
+
+/*-w (deadline)
+Exit after N seconds, regardless of how many pings sent.
+→ Track elapsed time with gettimeofday() or clock_gettime().*/
+	int w;
+
+/*-W (timeout for reply)
+Timeout for each reply (how long to wait for a response).
+→ Set recvfrom() timeout with setsockopt() using SO_RCVTIMEO.*/
+	int W;
+
+/*-p (interval or pattern)
+-p (custom pattern in payload) is easier than interval handling.
+→ Just copy a byte pattern into the ICMP payload buffer.*/
 	int p;
+
+/*
+-n (numeric output only)
+Disable DNS lookup for hosts.
+→ Just avoid gethostbyaddr() or similar when printing IP.
+*/
+	int n;
+
+	//?
+	int i;
 	int	total;
 	int	error;
 } t_flags;

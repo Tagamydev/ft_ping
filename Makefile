@@ -6,7 +6,7 @@
 #    By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/05 01:22:18 by samusanc          #+#    #+#              #
-#    Updated: 2025/05/26 07:56:47 by samusanc         ###   ########.fr        #
+#    Updated: 2025/05/26 09:08:28 by samusanc         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ SUBMODLIB	= ./libft/libft.a
 #================================= GCC ==================================#
 
 # GCC WITH LIBS AND INCLUDES
-CFLAGS		=# -fsanitize=address
+CFLAGS		= -fsanitize=address
 CFLAGS	   +=# -Wall -Wextra -Werror
 CC			= gcc $(CFLAGS) $(INC)
 

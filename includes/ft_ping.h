@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_nm.h                                            :+:      :+:    :+:   */
+/*   ft_ping.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:54:32 by samusanc          #+#    #+#             */
-/*   Updated: 2025/05/07 19:27:40 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/05/26 05:31:23 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_NM_H
-# define FT_NM_H
+#ifndef FT_PING_H
+# define FT_PING_H
 # include <stdio.h>
 # include <sys/types.h>
 # include <sys/stat.h>

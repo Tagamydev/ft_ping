@@ -6,12 +6,11 @@
 #    By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/05 01:22:18 by samusanc          #+#    #+#              #
-#    Updated: 2025/05/26 05:24:13 by samusanc         ###   ########.fr        #
+#    Updated: 2025/05/26 07:56:47 by samusanc         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		= ft_ping
-COMPOSE := $(shell command -v docker-compose || echo "docker compose")
 
 #=============================== INCLUDES ===============================#
 
@@ -33,6 +32,8 @@ CC			= gcc $(CFLAGS) $(INC)
 
 SRCS		= \
 				./src/main.c \
+				./src/utils/help.c \
+				./src/utils/flags.c \
 
 #================================= OBJS =================================#
 
@@ -44,6 +45,7 @@ OBJS		= $(addprefix $(O_DIR)/, $(SRCS:.c=.o))
 $(O_DIR)/%.o: %.c
 	@mkdir -p $(@D)
 	$(CC) $(INC) -g -c $< -o $(O_DIR)/$(<:.c=.o)
+	rm -rf .mandatory
 
 all: submodules $(NAME)
 

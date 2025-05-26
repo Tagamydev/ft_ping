@@ -1,0 +1,7 @@
+ft_ping
+objects
+libft/*.o
+libft/*/*.o
+libft/*/*/*.o
+.make_submodules
+.mandatory

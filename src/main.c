@@ -6,7 +6,7 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:18:02 by samusanc          #+#    #+#             */
-/*   Updated: 2025/05/26 07:57:05 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/05/26 08:04:06 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,10 @@ int	ft_ping(char *file, t_flags flags, int multiple)
 	if (file[0] == '-')
 		return 0;
 	int	i = 1;
+	while(1)
 	{
 		printf("From 192.168.0.182 icmp_seq=%d Destination Host Unreachable\n", i++);
+		sleep(1);
 	}
 	return 0;
 }

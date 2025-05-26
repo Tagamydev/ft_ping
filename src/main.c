@@ -6,7 +6,7 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:18:02 by samusanc          #+#    #+#             */
-/*   Updated: 2025/05/26 14:42:35 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/05/26 14:46:20 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,10 +102,11 @@ int	ft_ping(t_node *new_ipv4)
 	while(1)
 	{
 		if (!ping->alive)
-			return 0;
+			break ;
 		printf("64 bytes from 108.157.93.36: icmp_seq=1 ttl=248 time=3,887 ms\n");
 		sleep(1);
 	}
+	printf("hello\n");
 	print_ping_result(ip);
 	return 0;
 }

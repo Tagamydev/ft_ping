@@ -6,11 +6,11 @@
 #    By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/05 01:22:18 by samusanc          #+#    #+#              #
-#    Updated: 2025/05/08 14:56:33 by smsanchez        ###   ########.fr        #
+#    Updated: 2025/05/26 05:24:13 by samusanc         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME		= ft_nm
+NAME		= ft_ping
 COMPOSE := $(shell command -v docker-compose || echo "docker compose")
 
 #=============================== INCLUDES ===============================#
@@ -33,11 +33,6 @@ CC			= gcc $(CFLAGS) $(INC)
 
 SRCS		= \
 				./src/main.c \
-				./src/x64/x64_utils.c \
-				./src/x86/x86_utlis.c \
-				./src/utils/flags.c \
-				./src/utils/print_utils.c \
-				./src/utils/utils.c \
 
 #================================= OBJS =================================#
 

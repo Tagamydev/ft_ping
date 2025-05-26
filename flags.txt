@@ -1,0 +1,11 @@
+	value flags: they need a value to work and cannot have another flag in front
+	int		c;
+	int		w;
+	int		W;
+	int		p;
+	int		i;
+
+	novalue flags can have any flag in front!
+	int q;
+	int v;
+	int help;

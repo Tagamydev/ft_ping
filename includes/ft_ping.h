@@ -6,7 +6,7 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:54:32 by samusanc          #+#    #+#             */
-/*   Updated: 2025/05/26 16:13:45 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/05/26 17:36:04 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,8 +73,8 @@ Timeout for each reply (how long to wait for a response).
 
 void	print_help();
 int		error(char *title, char *message, int i);
-void	parse_flag(t_flags *result, char *str);
-t_flags	parse_flags(char **argv);
+//void	parse_flag(t_flags *result, char *str);
+//t_flags	parse_flags(char **argv);
 void	*free_header(void *ptr);
 char	*convert_addr(int addr, int is_64);
 

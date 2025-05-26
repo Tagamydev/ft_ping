@@ -6,7 +6,7 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:18:02 by samusanc          #+#    #+#             */
-/*   Updated: 2025/05/26 16:24:50 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/05/26 17:43:49 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,105 +73,64 @@ int	check_pad(char *str)
 	return (0);
 }
 
-int	verify_hostnames(char *str, t_flags *flags)
+int		parse_flag(int *value_flag, char *last_flag, char *flag)
 {
-	static int	toogled = 0;
-	static char	last_flag = '\0';
+	if (flag[0] != '-')
+	{
+		if (*value_flag)
+		{
+			*value_flag = 0;
+			return (2);
+		}
+		return (0);
+	}
+	return (1);
+}
 
-	if (!strcmp(str, "-n") || !strcmp(str, "-?") || !strcmp(str, "-v"))
-		return (1);
-	else if (str[0] == '-')
-	{
-		toogled = 1;
-		return (1);
-	}
-	if (toogled)
-	{
-		if (last_flag == 'c')
+void	parse_flags(char **argv, t_ping *result)
+{
+	int		value_flag = 0;
+	char	last_flag = 0;
+
+	for (int i = 0; argv[i] && !result->flags.error; i++) {
+		int	arg_type = parse_flag(&value_flag, &last_flag, argv[i]);
+		if (!arg_type)
+			list_push_b(&result->ips, node(new_ip(argv[i]), free_ip));
+		if (arg_type == -1)
+			return ;
+		if (arg_type == 0)
+			continue ;
+		switch (last_flag)
 		{
-			if (check_number(str))
-			{
-				flags->number = atoi(str);
-				return (2);
-			}
-			else
-			{
-				flags->error = 1;
-				return (-1);
-			}
-		}
-		if (last_flag == 'w')
-		{
-			if (check_number(str))
-			{
-				flags->deadline = atoi(str);
-				return (2);
-			}
-			else
-			{
-				flags->error = 1;
-				return (-1);
-			}
-		}
-		if (last_flag == 'W')
-		{
-			if (check_number(str))
-			{
-				flags->timeout = atoi(str);
-				return (2);
-			}
-			else
-			{
-				flags->error = 1;
-				return (-1);
-			}
-		}
-		if (last_flag == 'i')
-		{
-			if (check_number(str))
-			{
-				flags->interval = atoi(str);
-				return (2);
-			}
-			else
-			{
-				flags->error = 1;
-				return (-1);
-			}
-		}
-		if (last_flag == 'p')
-		{
-			if (check_pad(str))
-			{
-				if (flags->pad)
-					free(flags->pad);
-				flags->pad = strdup(str);
-				return (2);
-			}
-			else
-			{
-				flags->error = 1;
-				return (-1);
-			}
+			case 'i':
+				break ;
+
 		}
 	}
-	return (0);
 }
 
 t_ping	*init_ping(char **argv)
 {
 	t_ping	*result = NULL;
 	int		i = 0;
-
+	
 	result = malloc(sizeof(t_ping));
 	if (!result)
 		return NULL;
 	bzero(result, sizeof(t_ping));
+	parse_flags(argv, result);
+	if (result->flags.error && result->flags.error != -1)
+	{
+		free(result);
+		return NULL;
+	}
+	if (result->flags.error == -1)
+	{
+		print_help();
+		return NULL;
+	}
 	while(argv[i])
 	{
-		// this need to be changed, because of the flags
-		if (argv[i][0] != '-')
-			list_push_b(&result->ips, node(new_ip(argv[i]), free_ip));
 		i++;
 	}
 	result->alive = 1;
@@ -224,10 +183,7 @@ int	main(int argc, char **argv)
 	argv++;
 	int		error;
     struct	sigaction sa;
-	t_flags	flags = parse_flags(argv);
-	
-	if (flags.error && flags.error != -1)
-		return 1;
+
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = handle_signal;
     sigaction(SIGINT, &sa, NULL);

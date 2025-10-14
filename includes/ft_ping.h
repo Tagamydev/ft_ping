@@ -26,11 +26,12 @@
 # include <elf.h>
 # include <time.h>
 # include "libft.h"
-#include <signal.h>
+# include <signal.h>
 //#include <strings.h>
 //#include <stdint.h>
 //#include <stddef.h>
-#include <netinet/ip_icmp.h>
+# include <netinet/ip_icmp.h>
+# include <sys/time.h>
 
 typedef	struct s_header{
 	size_t	addr;
@@ -53,9 +54,9 @@ char	*convert_addr(int addr, int is_64);
 
 
 // ICMP FT
-int update_icmp(int i);
-int send_icmp(t_ip *ip);
-int recv_icmp(int i);
+int update_icmp(int i, t_ip *ip);
+int send_icmp(int i, t_ip *ip);
+int recv_icmp(int i, t_ip *ip);
 
 //t_ping	*ping = NULL;
 

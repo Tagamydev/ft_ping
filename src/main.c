@@ -43,11 +43,11 @@ int	ft_ping(t_node *new_ipv4)
 		if (!ping->alive)
 			break ;
 		// update icmp package
-		update_icmp(i);
+		update_icmp(i, ip);
 		// send icmp package
-		send_icmp(ip);
+		send_icmp(i, ip);
 		// recv icmp package
-		recv_icmp(i);
+		recv_icmp(i, ip);
 		sleep(1);
 		i++;
 	}

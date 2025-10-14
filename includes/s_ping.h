@@ -36,10 +36,18 @@ typedef struct s_ping {
 	t_list		ips;
 	int			alive;
 	int			error;
-	size_t		ttl;
+	int 		ttl;
 	pid_t		pid;
 	char		*icmp;
 } t_ping;
+
+
+
+# define MAXHOPS 30
+# define PACKET_SIZE 64
+# define RECV_BUF 1500
+# define TIMEOUT_SEC 1
+
 
 // global variable
 extern t_ping	*ping;

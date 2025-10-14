@@ -11,10 +11,18 @@ void	free_ping(void)
 	ping = NULL;
 }
 
+void    config_icmp(char *ptr, pid_t pid)
+{
+    memset(ptr, 0, PACKET_SIZE);
+    struct icmphdr *icmp = (struct icmphdr *)ptr;
+    icmp->type = ICMP_ECHO;
+    icmp->code = 0;
+    icmp->un.echo.id = htons(pid);
+}
+
 t_ping	*init_ping(char **argv)
 {
 	t_ping	*result;
-	int		i = 0;
 
 	result = malloc(sizeof(t_ping));
 	if (!result)
@@ -40,12 +48,18 @@ t_ping	*init_ping(char **argv)
 		return (NULL);
 	}
 
-	while (argv[i])
-		i++;
-
 	result->pid = getpid() & 0xFFFF;
 	result->alive = 1;
-	result->icmp = NULL;
+    result->ttl = 30;
 
+    char sendbuf[PACKET_SIZE];
+
+    result->icmp = malloc(sizeof(sendbuf));
+    if (!result->icmp)
+	{
+		free(result);
+		return (NULL);
+	}
+    config_icmp(result->icmp, result->pid);
 	return (result);
 }

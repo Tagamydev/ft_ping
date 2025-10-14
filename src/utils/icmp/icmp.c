@@ -19,14 +19,37 @@ uint16_t checksum(void *buf, size_t len) {
 }
 
 
-int update_icmp(int i)
+int update_icmp(int i, t_ip *ip)
 {
+    if (setsockopt(ip->socket.socket, IPPROTO_IP, IP_TTL, &ping->ttl, sizeof(ping->ttl)) < 0) {
+        // fix this
+        perror("setsockopt(IP_TTL)");
+        return 1;
+    }
 
+    struct icmphdr *icmp = (struct icmphdr *)ping->icmp;
+    struct timeval t1;
+
+    icmp->un.echo.sequence = htons(i);
+    gettimeofday(&t1, NULL);
+    memcpy(ping->icmp + sizeof(struct icmphdr), &t1, sizeof(t1));
+    icmp->checksum = 0;
+    icmp->checksum = checksum((void*)icmp, PACKET_SIZE);
 }
 
 // send icmp need to be rework!!!!
-int send_icmp(t_ip *ip)
+int send_icmp(int i, t_ip *ip)
 {
+    ssize_t sent = sendto(
+        ip->socket.socket, 
+        ping->icmp, 
+        PACKET_SIZE, 
+        0,
+        (struct sockaddr*)&ip->socket.dest_addr, 
+        sizeof(ip->socket.dest_addr)
+    );
+    if (sent < 0)
+        return -1;
 	/*
 	int sock = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 	struct sockaddr_in dst = { .sin_family = AF_INET, .sin_addr.s_addr = inet_addr("127.0.0.1") };
@@ -44,7 +67,7 @@ int send_icmp(t_ip *ip)
 	*/
 }
 
-int recv_icmp(int i)
+int recv_icmp(int i, t_ip *ip)
 {
 	printf("64 bytes from 108.157.93.36: icmp_seq=%d ttl=248 time=3,887 ms\n", i);
 }

@@ -1,0 +1,78 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_ping.h                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/28 08:54:32 by samusanc          #+#    #+#             */
+/*   Updated: 2025/05/26 17:36:04 by samusanc         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef S_FLAGS_H
+# define S_FLAGS_H
+# include <stdio.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <fcntl.h>
+# include <unistd.h>
+# include <sys/mman.h>
+# include <stdlib.h>
+# include <string.h>
+# include <elf.h>
+# include <time.h>
+# include "libft.h"
+#include <signal.h>
+//#include <strings.h>
+//#include <stdint.h>
+//#include <stddef.h>
+#include <netinet/ip_icmp.h>
+
+typedef struct s_flags{
+
+/*-c (count)
+Stop sending pings after N requests.
+→ Just use a counter. Easy logic around loop iteration.*/
+	int		c;
+	size_t	number;
+
+/*-w (deadline)
+Exit after N seconds, regardless of how many pings sent.
+→ Track elapsed time with gettimeofday() or clock_gettime().*/
+	int		w;
+	size_t	deadline;
+
+/*-W (timeout for reply)
+Timeout for each reply (how long to wait for a response).
+→ Set recvfrom() timeout with setsockopt() using SO_RCVTIMEO.*/
+	int W;
+	size_t	timeout;
+
+/* You may specify up to 16 "pad" bytes to fill out the packet you send.  This is useful for diagnosing data-dependent problems in a network.  For exam‐
+ ple, “-p ff” will cause the sent packet to be filled with all ones.*/
+	int	p;
+	// how can i verify this???
+	char	*pad;
+
+
+// yeahhhhhhhhhhhhhhhh
+	int q;
+
+	//?
+	int i;
+	int	interval;
+
+	int v;
+	int help;
+
+	int	total;
+	int	error;
+} t_flags;
+
+# include "s_ping.h"
+
+int		parse_flag(int *value_flag, char *last_flag, char *flag);
+void	parse_flags(char **argv, t_ping *result);
+
+#endif

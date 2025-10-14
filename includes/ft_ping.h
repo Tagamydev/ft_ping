@@ -12,6 +12,9 @@
 
 #ifndef FT_PING_H
 # define FT_PING_H
+# include "s_flags.h"
+# include "s_ip.h"
+# include "s_ping.h"
 # include <stdio.h>
 # include <sys/types.h>
 # include <sys/stat.h>
@@ -23,6 +26,11 @@
 # include <elf.h>
 # include <time.h>
 # include "libft.h"
+#include <signal.h>
+//#include <strings.h>
+//#include <stdint.h>
+//#include <stddef.h>
+#include <netinet/ip_icmp.h>
 
 typedef	struct s_header{
 	size_t	addr;
@@ -30,52 +38,26 @@ typedef	struct s_header{
 	char	*name;
 }	t_header;
 
-typedef struct s_flags{
 
-/*-c (count)
-Stop sending pings after N requests.
-→ Just use a counter. Easy logic around loop iteration.*/
-	int		c;
-	size_t	number;
-
-/*-w (deadline)
-Exit after N seconds, regardless of how many pings sent.
-→ Track elapsed time with gettimeofday() or clock_gettime().*/
-	int		w;
-	size_t	deadline;
-
-/*-W (timeout for reply)
-Timeout for each reply (how long to wait for a response).
-→ Set recvfrom() timeout with setsockopt() using SO_RCVTIMEO.*/
-	int W;
-	size_t	timeout;
-
-/* You may specify up to 16 "pad" bytes to fill out the packet you send.  This is useful for diagnosing data-dependent problems in a network.  For exam‐
- ple, “-p ff” will cause the sent packet to be filled with all ones.*/
-	int	p;
-	// how can i verify this???
-	char	*pad;
-
-
-// yeahhhhhhhhhhhhhhhh
-	int q;
-
-	//?
-	int i;
-	int	interval;
-
-	int v;
-	int help;
-
-	int	total;
-	int	error;
-} t_flags;
+#define TIMEOUT_SEC 1
+#define MAXHOPS 30
+#define PACKET_SIZE 64
+#define RECV_BUF 1500
 
 void	print_help();
 int		error(char *title, char *message, int i);
-//void	parse_flag(t_flags *result, char *str);
-//t_flags	parse_flags(char **argv);
+
+
 void	*free_header(void *ptr);
 char	*convert_addr(int addr, int is_64);
+
+
+// ICMP FT
+int update_icmp(int i);
+int send_icmp(t_ip *ip);
+int recv_icmp(int i);
+
+//t_ping	*ping = NULL;
+
 
 #endif

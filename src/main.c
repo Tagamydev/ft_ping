@@ -11,136 +11,14 @@
 /* ************************************************************************** */
 
 #include "ft_ping.h"
-#include "libft.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <strings.h>
-#include <unistd.h>
-#include <string.h>
 
-typedef struct s_ip{
-	char		*ip;
-	size_t		packets_transmitted;
-	size_t		packets_received;
-	size_t		time;
-	clock_t		start_time;
-	clock_t		end_time;
-	double		min;
-	double		avg;
-	double		max;
-} t_ip;
-
-typedef struct s_ping{
-	t_flags		flags;
-	t_list		ips;
-	int			alive;
-	int			error;
-} t_ping;
-
-t_ping	*ping = NULL;
-
-void	*free_ip(void *ptr)
-{
-	t_ip	*cast;
-
-	cast = (t_ip *)ptr;
-	free(cast->ip);
-	free(ptr);
-	return (NULL);
-}
-
-t_ip	*new_ip(char *ip)
-{
-	t_ip	*result;
-
-	result = malloc(sizeof(t_ip));
-	if (!result)
-		return (result);
-	bzero(result, sizeof(t_ip));
-	result->ip = strdup(ip);
-	return (result);
-}
-
-int	check_number(char *str)
-{
-	return (0);
-
-}
-
-int	check_pad(char *str)
-{
-	return (0);
-}
-
-int		parse_flag(int *value_flag, char *last_flag, char *flag)
-{
-	if (flag[0] != '-')
-	{
-		if (*value_flag)
-		{
-			*value_flag = 0;
-			return (2);
-		}
-		return (0);
-	}
-	return (1);
-}
-
-void	parse_flags(char **argv, t_ping *result)
-{
-	int		value_flag = 0;
-	char	last_flag = 0;
-
-	for (int i = 0; argv[i] && !result->flags.error; i++) {
-		int	arg_type = parse_flag(&value_flag, &last_flag, argv[i]);
-		if (!arg_type)
-			list_push_b(&result->ips, node(new_ip(argv[i]), free_ip));
-		if (arg_type == -1)
-			return ;
-		if (arg_type == 0)
-			continue ;
-		switch (last_flag)
-		{
-			case 'i':
-				break ;
-
-		}
-	}
-}
-
-t_ping	*init_ping(char **argv)
-{
-	t_ping	*result = NULL;
-	int		i = 0;
-	
-	result = malloc(sizeof(t_ping));
-	if (!result)
-		return NULL;
-	bzero(result, sizeof(t_ping));
-	parse_flags(argv, result);
-	if (result->flags.error && result->flags.error != -1)
-	{
-		free(result);
-		return NULL;
-	}
-	if (result->flags.error == -1)
-	{
-		print_help();
-		return NULL;
-	}
-	while(argv[i])
-	{
-		i++;
-	}
-	result->alive = 1;
-	return (result);
-}
+t_ping *ping = NULL;
 
 void	print_ping_result(t_ip *ip)
 {
 	if (!ip)
 		return ;
+	// here i need to put the ip!!
 	printf("--- 172.0.0.21 ping statistics ---\n");
 	printf("4 packets transmitted, 0 packets received, 100%% packet loss\n");
 	if (ip->packets_transmitted)
@@ -157,15 +35,23 @@ int	ft_ping(t_node *new_ipv4)
 	double	total = 0.0f;
 	size_t	i = 0;
 
+	// what is printing here???
 	printf("PING %s (%s) 56(84) bytes of data.\n", ip->ip, ip->ip);
+	// this while 1 need to be changed to c
 	while(1)
 	{
 		if (!ping->alive)
 			break ;
-		printf("64 bytes from 108.157.93.36: icmp_seq=%d ttl=248 time=3,887 ms\n", i);
+		// update icmp package
+		update_icmp(i);
+		// send icmp package
+		send_icmp(ip);
+		// recv icmp package
+		recv_icmp(i);
 		sleep(1);
 		i++;
 	}
+	// need a revision?
 	print_ping_result(ip);
 	return 0;
 }
@@ -178,8 +64,10 @@ void handle_signal(int sig)
 		ping->alive = 0;
 }
 
+
 int	main(int argc, char **argv)
 {
+	//send_icmp();
 	argv++;
 	int		error;
     struct	sigaction sa;
@@ -198,6 +86,6 @@ int	main(int argc, char **argv)
 
 	list_clear(&ping->ips);
 	error = ping->error;
-	free(ping);
+	free_ping(ping);
 	return (error);
 }

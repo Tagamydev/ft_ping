@@ -33,7 +33,10 @@ CC			= gcc $(CFLAGS) $(INC)
 SRCS		= \
 				./src/main.c \
 				./src/utils/help.c \
-				./src/utils/flags.c \
+				./src/utils/flags/flags.c \
+				./src/utils/icmp/icmp.c \
+				./src/utils/ip/ip.c \
+				./src/utils/ping/ping.c \
 
 #================================= OBJS =================================#
 

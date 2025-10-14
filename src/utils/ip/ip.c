@@ -28,6 +28,39 @@ t_ip	*new_ip(char *ip)
 	memset(&result->socket.dest_addr, 0, sizeof(result->socket.dest_addr));
 	result->socket.dest_addr.sin_family = AF_INET;
 
+
+
+
+
+
+
+	// ---------------------------------- address solver
+
+
+	struct sockaddr_in sa;
+	struct addrinfo hints, *res;
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_INET; // IPv4 only
+	hints.ai_socktype = SOCK_RAW;
+
+	int err = getaddrinfo(result->ip, NULL, &hints, &res);
+	if (err != 0) {
+		fprintf(stderr, "ft_ping: cannot resolve %s: %s\n", result->ip, gai_strerror(err));
+		return free_ip(result);
+	}
+
+	// copy resolved IP to your dest_addr
+	result->socket.dest_addr.sin_family = AF_INET;
+	result->socket.dest_addr.sin_addr = ((struct sockaddr_in *)res->ai_addr)->sin_addr;
+
+	freeaddrinfo(res);
+
+
+	// ---------------------------------- address solver
+
+
+
 	if (inet_pton(AF_INET, result->ip, &result->socket.dest_addr.sin_addr) <= 0)
 		return (free_ip(result));
 
@@ -44,15 +77,6 @@ t_ip	*new_ip(char *ip)
         printf("ft_ping: error timeval\n");
 		return (free_ip(result));
     }
-
-    /*
-	if (setsockopt(result->socket.socket, IPPROTO_IP, IP_TTL, &ping->ttl, sizeof(ping->ttl)) < 0)
-    {
-        printf("ft_ping: error second socket opt\n");
-		return (free_ip(result));
-    }
-    */
-    printf("new ip added: %s\n", ip);
 
 	return (result);
 }

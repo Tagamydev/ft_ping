@@ -69,5 +69,79 @@ int send_icmp(int i, t_ip *ip)
 
 int recv_icmp(int i, t_ip *ip)
 {
-	printf("64 bytes from 108.157.93.36: icmp_seq=%d ttl=248 time=3,887 ms\n", i);
+    char recvbuf[RECV_BUF];
+    struct sockaddr_in from;
+    socklen_t fromlen = sizeof(from);
+    ssize_t recvd = recvfrom(
+        ip->socket.socket, 
+        recvbuf, 
+        sizeof(recvbuf), 
+        0,
+        (struct sockaddr*)&from,
+        &fromlen
+    );
+
+    if (recvd < 0) {
+        return 1;
+    }
+
+    // parse IP header
+    struct ip *ip_hdr = (struct ip *)recvbuf;
+    int ip_hdr_len = ip_hdr->ip_hl * 4;
+
+    // outer ICMP
+    struct icmphdr *outer_icmp = (struct icmphdr *)(recvbuf + ip_hdr_len);
+
+    if (outer_icmp->type == ICMP_TIME_EXCEEDED) {
+
+
+        // router tells us TTL expired; inside is original IP + 8 bytes of original payload
+        // inner IP begins after outer ICMP header
+        char *inner = recvbuf + ip_hdr_len + sizeof(struct icmphdr);
+        struct ip *inner_ip = (struct ip *)inner;
+        int inner_ip_len = inner_ip->ip_hl * 4;
+        struct icmphdr *inner_icmp = (struct icmphdr *)(inner + inner_ip_len);
+
+        // check id/seq match
+        if (ntohs(inner_icmp->un.echo.id) == ping->pid)
+        {
+            char addrstr[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, &from.sin_addr, addrstr, sizeof(addrstr));
+            printf("%2d  %s  (type=11)\n", ping->ttl, addrstr);
+        }
+        else
+        {
+            // not our probe; ignore or handle
+            printf("%2d  %s  (time-exceeded, not matching id)\n", ping->ttl, inet_ntoa(from.sin_addr));
+        }
+
+
+    } else if (outer_icmp->type == ICMP_ECHOREPLY) {
+
+
+
+        // destination replied
+        char addrstr[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &from.sin_addr, addrstr, sizeof(addrstr));
+
+        // compute RTT if you stored timestamp in payload
+        struct timeval t2;
+        gettimeofday(&t2, NULL);
+        struct timeval tsent;
+        memcpy(&tsent, recvbuf + ip_hdr_len + sizeof(struct icmphdr), sizeof(tsent));
+        double rtt = (t2.tv_sec - tsent.tv_sec) * 1000.0 + (t2.tv_usec - tsent.tv_usec) / 1000.0;
+
+        printf("%2d  %s  (echo-reply)  RTT=%.3f ms\n", ping->ttl, addrstr, rtt);
+        return 1;
+
+
+    } else {
+        /*
+        // other ICMP types (dest unreachable, etc)
+        printf("%2d  %s  (ICMP type %d code %d)\n", ping->ttl,
+                inet_ntoa(from.sin_addr), outer_icmp->type, outer_icmp->code);
+        */
+    }
+    return 0;
+//	printf("64 bytes from 108.157.93.36: icmp_seq=%d ttl=248 time=3,887 ms\n", i);
 }

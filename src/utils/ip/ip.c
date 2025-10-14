@@ -2,12 +2,14 @@
 
 void	*free_ip(void *ptr)
 {
-	t_ip	*cast;
+	t_ip	*cast = (t_ip *)ptr;
 
-	cast = (t_ip *)ptr;
+	if (!cast)
+		return (NULL);
+	if (cast->socket.socket > 0)
+		close(cast->socket.socket);
 	free(cast->ip);
-	free(ptr);
-	close(cast->socket.socket);
+	free(cast);
 	return (NULL);
 }
 
@@ -17,36 +19,40 @@ t_ip	*new_ip(char *ip)
 
 	result = malloc(sizeof(t_ip));
 	if (!result)
-		return (result);
-	bzero(result, sizeof(t_ip));
+		return (NULL);
+	memset(result, 0, sizeof(t_ip));
 	result->ip = strdup(ip);
+	if (!result->ip)
+		return (free_ip(result));
 
-	// start socket
+	memset(&result->socket.dest_addr, 0, sizeof(result->socket.dest_addr));
+	result->socket.dest_addr.sin_family = AF_INET;
 
-    //if (argc != 2) { fprintf(stderr, "usage: %s <dest-ip>\n", argv[0]); exit(1); }
-    memset(&result->socket.dest_addr, 0, sizeof(result->socket.dest_addr));
-    result->socket.dest_addr.sin_family = AF_INET;
-    inet_pton(AF_INET, result->ip, &result->socket.dest_addr.sin_addr);
-    result->socket.socket = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
-    if (result->socket.socket < 0)
-	{
-		free_ip(result);
-		return (NULL);
-	}
+	if (inet_pton(AF_INET, result->ip, &result->socket.dest_addr.sin_addr) <= 0)
+		return (free_ip(result));
 
+	result->socket.socket = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+	if (result->socket.socket < 0)
+    {
+        write(2, "ft_ping: make sure you are running this as sudo\n", 48);
+		return (free_ip(result));
+    }
 
-    struct timeval tv = { .tv_sec = TIMEOUT_SEC, .tv_usec = 0 };
+	struct timeval tv = { .tv_sec = TIMEOUT_SEC, .tv_usec = 0 };
 	if (setsockopt(result->socket.socket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0)
-	{
-		free_ip(result);
-		return (NULL);
-	}
+    {
+        printf("ft_ping: error timeval\n");
+		return (free_ip(result));
+    }
 
+    /*
 	if (setsockopt(result->socket.socket, IPPROTO_IP, IP_TTL, &ping->ttl, sizeof(ping->ttl)) < 0)
-	{
-		free_ip(result);
-		return (NULL);
-	}
+    {
+        printf("ft_ping: error second socket opt\n");
+		return (free_ip(result));
+    }
+    */
+    printf("new ip added: %s\n", ip);
 
 	return (result);
 }

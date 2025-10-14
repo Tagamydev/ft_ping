@@ -1,42 +1,51 @@
 #include "ft_ping.h"
 #include "s_flags.h"
 
-// ping destructor
-void	free_ping()
+void	free_ping(void)
 {
-    free(ping->icmp);
+	if (!ping)
+		return;
+	free(ping->icmp);
+	ping->icmp = NULL;
 	free(ping);
+	ping = NULL;
 }
 
-// ping constructor
 t_ping	*init_ping(char **argv)
 {
-	t_ping	*result = NULL;
+	t_ping	*result;
 	int		i = 0;
-	
+
 	result = malloc(sizeof(t_ping));
 	if (!result)
-		return NULL;
-	bzero(result, sizeof(t_ping));
-	parse_flags(argv, result);
+		return (NULL);
+
+	memset(result, 0, sizeof(t_ping));
+	if (!parse_flags(argv, result))
+	{
+        printf("ft_ping: error parsing flags\n");
+		free(result);
+		return (NULL);
+	}
+
 	if (result->flags.error && result->flags.error != -1)
 	{
 		free(result);
-		return NULL;
+		return (NULL);
 	}
 	if (result->flags.error == -1)
 	{
 		print_help();
-		return NULL;
+		free(result);
+		return (NULL);
 	}
-	while(argv[i])
-	{
+
+	while (argv[i])
 		i++;
-	}
 
 	result->pid = getpid() & 0xFFFF;
 	result->alive = 1;
-
+	result->icmp = NULL;
 
 	return (result);
 }

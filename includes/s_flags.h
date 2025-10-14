@@ -73,6 +73,6 @@ Timeout for each reply (how long to wait for a response).
 # include "s_ping.h"
 
 int		parse_flag(int *value_flag, char *last_flag, char *flag);
-void	parse_flags(char **argv, t_ping *result);
+void	*parse_flags(char **argv, t_ping *result);
 
 #endif

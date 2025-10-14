@@ -23,11 +23,12 @@
 # include <elf.h>
 # include <time.h>
 # include "libft.h"
-#include <signal.h>
+# include <signal.h>
 //#include <strings.h>
 //#include <stdint.h>
 //#include <stddef.h>
-#include <netinet/ip_icmp.h>
+# include <netinet/ip_icmp.h>
+# include "ctype.h"
 
 # include "s_flags.h"
 typedef struct s_ping {

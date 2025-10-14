@@ -78,6 +78,8 @@ int	main(int argc, char **argv)
     sigaction(SIGTERM, &sa, NULL);
 
 	ping = init_ping(argv);
+	if (!ping)
+		return (-1);
 	t_node	*tmp = ping->ips.head;
 	for (size_t i = 0; i < ping->ips.size; i++) {
 		ft_ping(tmp);

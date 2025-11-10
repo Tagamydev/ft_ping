@@ -27,6 +27,8 @@
 # include <time.h>
 # include "libft.h"
 # include <signal.h>
+# include <netdb.h>          // <-- required for struct addrinfo, getaddrinfo(), freeaddrinfo(), gai_strerror()
+
 //#include <strings.h>
 //#include <stdint.h>
 //#include <stddef.h>

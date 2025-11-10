@@ -21,7 +21,7 @@ void	print_ping_result(t_ip *ip)
 	// here i need to put the ip!!
 	printf("--- 172.0.0.21 ping statistics ---\n");
 	printf("4 packets transmitted, 0 packets received, 100%% packet loss\n");
-	if (ip->packets_transmitted)
+	if (ip->packets_received)
 		printf("round-trip min/avg/max/stddev = 0,102/0,113/0,126/0,000 ms\n");
 }
 

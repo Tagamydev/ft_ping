@@ -40,6 +40,7 @@ typedef struct s_socket {
 
 typedef struct s_ip {
 	char		*ip;
+	char		*solved;
 	size_t		packets_transmitted;
 	size_t		packets_received;
 	size_t		time;

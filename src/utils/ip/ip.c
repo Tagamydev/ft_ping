@@ -12,6 +12,7 @@ void	*free_ip(void *ptr)
 	if (cast->socket.socket > 0)
 		close(cast->socket.socket);
 	free(cast->ip);
+	free(cast->solved);
 	free(cast);
 	return (NULL);
 }
@@ -58,6 +59,16 @@ t_ip	*new_ip(char *ip)
 	struct timeval tv = { .tv_sec = TIMEOUT_SEC, .tv_usec = 0 };
 	if (setsockopt(result->socket.socket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
 		perror("ft_ping: error setting timeout");
+		return (free_ip(result));
+	}
+
+	char resolved_ip[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &result->socket.dest_addr.sin_addr, resolved_ip, sizeof(resolved_ip));
+
+	result->solved = ft_strdup(resolved_ip);
+	if (!result->solved)
+	{
+		perror("ft_ping: error in dup");
 		return (free_ip(result));
 	}
 

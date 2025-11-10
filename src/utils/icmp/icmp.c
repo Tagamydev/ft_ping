@@ -177,6 +177,8 @@ int send_icmp(int seq, t_ip *ip) {
         perror("sendto");
         return -1;
     }
+
+    ip->packets_transmitted += 1;
     
     return 0;
 }

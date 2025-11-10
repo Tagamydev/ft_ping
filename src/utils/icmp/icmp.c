@@ -1,18 +1,5 @@
 #include "ft_ping.h"
 
-/**
- * CHECKSUM FUNCTION EXPLANATION:
- * ================================
- * ICMP packets require a checksum to verify data integrity during transmission.
- * This implements the Internet Checksum algorithm (RFC 1071):
- * 
- * 1. Sum all 16-bit words in the packet
- * 2. If there's an odd byte at the end, add it as a 16-bit value (padded with 0)
- * 3. Add any carry bits from the 32-bit sum back into the lower 16 bits
- * 4. Return the one's complement (~) of the result
- * 
- * The receiver calculates the same checksum - if data is intact, the result should be 0xFFFF
- */
 uint16_t checksum(void *buf, size_t len) {
     uint32_t sum = 0;
     uint16_t *data = (uint16_t *)buf;
@@ -86,25 +73,15 @@ static void handle_time_exceeded(char *recvbuf, int ip_hdr_len, struct sockaddr_
 static int handle_echo_reply(char *recvbuf, int ip_hdr_len, struct sockaddr_in *from, int seq, t_ip *ip) {
     char addrstr[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &from->sin_addr, addrstr, sizeof(addrstr));
-    
-    // Get current time
     struct timeval t2;
     gettimeofday(&t2, NULL);
-    
-    // Extract the timestamp we embedded in the ICMP payload
     struct timeval tsent;
     memcpy(&tsent, recvbuf + ip_hdr_len + sizeof(struct icmphdr), sizeof(tsent));
     
-    // Calculate round-trip time in milliseconds
     double rtt = (t2.tv_sec - tsent.tv_sec) * 1000.0 + 
                  (t2.tv_usec - tsent.tv_usec) / 1000.0;
-    
-    // Extract TTL from the received IP packet (not ping->ttl!)
     struct ip *ip_hdr = (struct ip *)recvbuf;
     int received_ttl = ip_hdr->ip_ttl;
-    
-    // Format time with comma as decimal separator (European format)
-    // Split into integer and fractional parts
     int rtt_int = (int)rtt;
     int rtt_frac = (int)((rtt - rtt_int) * 1000);
     
@@ -117,7 +94,7 @@ static int handle_echo_reply(char *recvbuf, int ip_hdr_len, struct sockaddr_in *
         ip->max = rtt;
     ip->avg = ( ip->packets_received * ip->avg + rtt) / (ip->packets_received + 1);
     ip->packets_received += 1;
-    return 1; // Signal that we got a reply
+    return 1;
 }
 
 /**

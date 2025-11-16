@@ -209,5 +209,6 @@ int recv_icmp(int seq, t_ip *ip) {
         // The destination replied - we've reached it!
         return handle_echo_reply(recvbuf, ip_hdr_len, &from, seq, ip);
     }
+    printf("here i'm reciving the ping response???\n");
     return 0;
 }

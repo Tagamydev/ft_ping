@@ -73,15 +73,6 @@ static void handle_time_exceeded(char *recvbuf, int ip_hdr_len, struct sockaddr_
 static int handle_echo_reply(char *recvbuf, int ip_hdr_len, struct sockaddr_in *from, int seq, t_ip *ip) {
     // e
 
-
-
-
-
-
-
-
-
-
     // this i think is wrong maybe need rework because i dont read the data from the response, i think, the response have time??? idk
     char addrstr[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &from->sin_addr, addrstr, sizeof(addrstr));
@@ -170,13 +161,7 @@ int send_icmp(int seq, t_ip *ip) {
         sizeof(ip->socket.dest_addr)
     );
     
-    if (sent < 0) {
-        perror("sendto");
-        return -1;
-    }
-
     ip->packets_transmitted += 1;
-    
     return 0;
 }
 

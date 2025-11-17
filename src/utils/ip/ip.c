@@ -55,6 +55,7 @@ t_ip	*new_ip(char *ip)
 		return (free_ip(result));
 	}
 
+
 	// Configure socket timeout
 	struct timeval tv = { .tv_sec = TIMEOUT_SEC, .tv_usec = 0 };
 	if (setsockopt(result->socket.socket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {

@@ -73,21 +73,29 @@ static void handle_time_exceeded(char *recvbuf, int ip_hdr_len, struct sockaddr_
 static int handle_echo_reply(char *recvbuf, int ip_hdr_len, struct sockaddr_in *from, int seq, t_ip *ip) {
     char addrstr[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &from->sin_addr, addrstr, sizeof(addrstr));
+    
     struct timeval t2;
     gettimeofday(&t2, NULL);
+    
+    // Get the actual sequence number from the received packet
+    struct icmphdr *icmp = (struct icmphdr *)(recvbuf + ip_hdr_len);
+    int actual_seq = ntohs(icmp->un.echo.sequence);  // ← Use THIS, not the parameter!
+    
     struct timeval tsent;
     memcpy(&tsent, recvbuf + ip_hdr_len + sizeof(struct icmphdr), sizeof(tsent));
     
     double rtt = (t2.tv_sec - tsent.tv_sec) * 1000.0 + 
                  (t2.tv_usec - tsent.tv_usec) / 1000.0;
+    
     struct ip *ip_hdr = (struct ip *)recvbuf;
     int received_ttl = ip_hdr->ip_ttl;
     int rtt_int = (int)rtt;
     int rtt_frac = (int)((rtt - rtt_int) * 1000);
     
+    // Use actual_seq from the packet, not the parameter
     printf("64 bytes from %s: icmp_seq=%d ttl=%d time=%d,%03d ms\n",
-           addrstr, seq, received_ttl, rtt_int, rtt_frac);
-    
+           addrstr, actual_seq, received_ttl, rtt_int, rtt_frac);
+
     if (rtt < ip->min)
         ip->min = rtt;
     if (rtt > ip->max)
@@ -209,6 +217,5 @@ int recv_icmp(int seq, t_ip *ip) {
         // The destination replied - we've reached it!
         return handle_echo_reply(recvbuf, ip_hdr_len, &from, seq, ip);
     }
-    printf("here i'm reciving the ping response???\n");
     return 0;
 }

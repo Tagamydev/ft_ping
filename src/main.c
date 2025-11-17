@@ -40,6 +40,21 @@ void	print_ping_result(t_ip *ip)
 		print_round_trip(ip);
 }
 
+
+// here i need a function that keep waiting until it reach 1 second 
+static void wait_while_recv(int i, t_ip *ip)
+{
+    time_t start_time = time(NULL);
+    time_t current_time;
+    double elapsed_time;
+    
+    do {
+        recv_icmp(i, ip);
+        current_time = time(NULL);
+        elapsed_time = difftime(current_time, start_time);
+    } while (elapsed_time < 1.0);
+}
+
 int	ft_ping(t_node *new_ipv4)
 {
 	if (!new_ipv4)
@@ -51,6 +66,7 @@ int	ft_ping(t_node *new_ipv4)
 	size_t	i = 0;
 
 	// what is printing here???
+	// this need to be changed
 	printf("PING %s (%s) 56(84) bytes of data.\n", ip->ip, ip->solved);
 	// this while 1 need to be changed to c
 	while(1)
@@ -59,11 +75,8 @@ int	ft_ping(t_node *new_ipv4)
 			break ;
 		// update icmp package
 		update_icmp(i, ip);
-		// send icmp package
 		send_icmp(i, ip);
-		// recv icmp package
-		recv_icmp(i, ip);
-		sleep(1);
+		wait_while_recv(i, ip);
 		i++;
 	}
 	// need a revision?

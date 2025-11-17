@@ -1,3 +1,29 @@
 - the localhost is wrong, it is printing weird stuff
 - the flags are not implemented yet
 need flags
+
+
+renfe is weird
+
+round-trip min/avg/max/stddev = 0,102/0,113/0,126/0,000 ms
+╭─samusanc@parrot ~/42/ft_ping ‹main› 
+╰─$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8): 56 data bytes
+64 bytes from 8.8.8.8: icmp_seq=0 ttl=117 time=1022,970 ms
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=117 time=196,684 ms
+^C--- 8.8.8.8 ping statistics ---
+9 packets transmitted, 2 packets received, 77% packet loss
+round-trip min/avg/max/stddev = 196,684/609,827/1022,970/413,143 ms
+╭─samusanc@parrot ~/42/ft_ping ‹main› 
+╰─$ sudo ./ft_ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=4 ttl=117 time=9075,873 ms
+64 bytes from 8.8.8.8: icmp_seq=5 ttl=117 time=8077,113 ms
+64 bytes from 8.8.8.8: icmp_seq=6 ttl=117 time=7075,497 ms
+64 bytes from 8.8.8.8: icmp_seq=7 ttl=117 time=6073,832 ms
+64 bytes from 8.8.8.8: icmp_seq=8 ttl=117 time=5072,170 ms
+^C--- 8.8.8.8 ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max/stddev = 0,102/0,113/0,126/0,000 ms
+╭─samusanc@parrot ~/42/ft_ping ‹main› 
+

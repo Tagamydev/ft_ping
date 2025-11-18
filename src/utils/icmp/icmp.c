@@ -70,8 +70,10 @@ static void handle_time_exceeded(char *recvbuf, int ip_hdr_len, struct sockaddr_
  *   3. Extract the TTL from the IP header of the received packet
  *   4. Display the result
  */
-static int handle_echo_reply(char *recvbuf, int ip_hdr_len, struct sockaddr_in *from, int seq, t_ip *ip) {
+static int handle_echo_reply(char *recvbuf, int ip_hdr_len, struct sockaddr_in *from, int seq, t_ip *ip, size_t recvd) {
     // e
+    if (recvd > 0)
+        recvd -= 20;
 
     // this i think is wrong maybe need rework because i dont read the data from the response, i think, the response have time??? idk
     char addrstr[INET_ADDRSTRLEN];
@@ -96,8 +98,9 @@ static int handle_echo_reply(char *recvbuf, int ip_hdr_len, struct sockaddr_in *
     int rtt_frac = (int)((rtt - rtt_int) * 1000);
     
     // Use actual_seq from the packet, not the parameter
-    printf("64 bytes from %s: icmp_seq=%d ttl=%d time=%d,%03d ms",
-           addrstr, actual_seq, received_ttl, rtt_int, rtt_frac);    
+    printf("%d bytes from %s: icmp_seq=%d ttl=%d time=%d,%03d ms",
+           recvd, addrstr, actual_seq, received_ttl, rtt_int, rtt_frac);    
+
     if (actual_seq != seq)
         printf(" (DUP!)\n");
     else
@@ -216,7 +219,7 @@ int recv_icmp(int seq, t_ip *ip) {
     } 
     else if (icmp->type == ICMP_ECHOREPLY) {
         // The destination replied - we've reached it!
-        return handle_echo_reply(recvbuf, ip_hdr_len, &from, seq, ip);
+        return handle_echo_reply(recvbuf, ip_hdr_len, &from, seq, ip, recvd);
     }
     return 0;
 }

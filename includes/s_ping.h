@@ -43,7 +43,6 @@ typedef struct s_ping {
 
 
 
-# define MAXHOPS 30
 # define PACKET_SIZE 64
 # define RECV_BUF 1500
 # define TIMEOUT_SEC 1

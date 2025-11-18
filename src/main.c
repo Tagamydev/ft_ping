@@ -16,8 +16,7 @@ t_ping *ping = NULL;
 
 void	print_round_trip(t_ip *ip)
 {
-	printf("round-trip min/avg/max/stddev = 0,102/0,113/0,126/0,000 ms\n");
-
+	printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/0,000 ms\n", ip->min, ip->avg, ip->max);
 }
 
 void	print_ping_result(t_ip *ip)
@@ -44,15 +43,15 @@ void	print_ping_result(t_ip *ip)
 // here i need a function that keep waiting until it reach 1 second 
 static void wait_while_recv(int i, t_ip *ip)
 {
-    time_t start_time = time(NULL);
-    time_t current_time;
-    double elapsed_time;
-    
-    do {
-        recv_icmp(i, ip);
-        current_time = time(NULL);
-        elapsed_time = difftime(current_time, start_time);
-    } while (elapsed_time < 1.0);
+	time_t start_time = time(NULL);
+	time_t current_time;
+	double elapsed_time;
+
+	do {
+	recv_icmp(i, ip);
+	current_time = time(NULL);
+	elapsed_time = difftime(current_time, start_time);
+	} while (elapsed_time < 1.0);
 }
 
 int	ft_ping(t_node *new_ipv4)
@@ -65,9 +64,7 @@ int	ft_ping(t_node *new_ipv4)
 	double	total = 0.0f;
 	size_t	i = 0;
 
-	// what is printing here???
-	// this need to be changed
-	printf("PING %s (%s) 56(84) bytes of data.\n", ip->ip, ip->solved);
+	printf("PING %s (%s): 56 data bytes\n", ip->ip, ip->solved);
 	// this while 1 need to be changed to c
 	while(1)
 	{
@@ -88,7 +85,7 @@ void handle_signal(int sig)
 {
 	if (!ping)
 		exit(1);
-    if (sig == SIGINT || sig == SIGTERM)
+	if (sig == SIGINT || sig == SIGTERM)
 		ping->alive = 0;
 }
 
@@ -98,12 +95,12 @@ int	main(int argc, char **argv)
 	//send_icmp();
 	argv++;
 	int		error;
-    struct	sigaction sa;
+	struct	sigaction sa;
 
-    memset(&sa, 0, sizeof(sa));
-    sa.sa_handler = handle_signal;
-    sigaction(SIGINT, &sa, NULL);
-    sigaction(SIGTERM, &sa, NULL);
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = handle_signal;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGTERM, &sa, NULL);
 
 	ping = init_ping(argv);
 	if (!ping)

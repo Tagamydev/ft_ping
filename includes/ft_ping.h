@@ -43,7 +43,6 @@ typedef	struct s_header{
 
 
 #define TIMEOUT_SEC 1
-#define MAXHOPS 30
 #define PACKET_SIZE 64
 #define RECV_BUF 1500
 

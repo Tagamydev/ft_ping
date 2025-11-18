@@ -31,7 +31,7 @@ t_ping	*init_ping(char **argv)
 	memset(result, 0, sizeof(t_ping));
 	if (!parse_flags(argv, result))
 	{
-        printf("ft_ping: error parsing flags\n");
+	printf("ft_ping: error parsing flags\n");
 		free(result);
 		return (NULL);
 	}
@@ -50,16 +50,16 @@ t_ping	*init_ping(char **argv)
 
 	result->pid = getpid() & 0xFFFF;
 	result->alive = 1;
-    result->ttl = 30;
+	result->ttl = 64;
 
-    char sendbuf[PACKET_SIZE];
+	char sendbuf[PACKET_SIZE];
 
-    result->icmp = malloc(sizeof(sendbuf));
-    if (!result->icmp)
+	result->icmp = malloc(sizeof(sendbuf));
+	if (!result->icmp)
 	{
 		free(result);
 		return (NULL);
 	}
-    config_icmp(result->icmp, result->pid);
+	config_icmp(result->icmp, result->pid);
 	return (result);
 }

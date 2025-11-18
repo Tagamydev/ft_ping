@@ -98,7 +98,7 @@ static int handle_echo_reply(char *recvbuf, int ip_hdr_len, struct sockaddr_in *
     int rtt_frac = (int)((rtt - rtt_int) * 1000);
     
     // Use actual_seq from the packet, not the parameter
-    printf("%d bytes from %s: icmp_seq=%d ttl=%d time=%d,%03d ms",
+    printf("%d bytes from %s: icmp_seq=%d ttl=%d time=%d.%03d ms",
            recvd, addrstr, actual_seq, received_ttl, rtt_int, rtt_frac);    
 
     if (actual_seq != seq)

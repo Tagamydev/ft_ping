@@ -11,11 +11,14 @@
 /* ************************************************************************** */
 
 #include "ft_ping.h"
+#include <math.h>
 
 t_ping *ping = NULL;
 
 void	print_round_trip(t_ip *ip)
 {
+	double variance = ((double)ip->sum_rtt_square / (double)ip->packets_received) - (double)(ip->avg * ip->avg);
+	variance = sqrt(variance);
 	printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/0,000 ms\n", ip->min, ip->avg, ip->max);
 }
 

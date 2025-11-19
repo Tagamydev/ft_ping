@@ -109,12 +109,16 @@ static int handle_echo_reply(char *recvbuf, int ip_hdr_len, struct sockaddr_in *
         ip->last = actual_seq;
     }
 
+    ip->sum_rtt += rtt;
+    ip->sum_rtt_square += rtt * rtt;
+
     if (rtt < ip->min)
         ip->min = rtt;
     if (rtt > ip->max)
         ip->max = rtt;
     ip->avg = ( ip->packets_received * ip->avg + rtt) / (ip->packets_received + 1);
     ip->packets_received += 1;
+
     return 1;
 }
 

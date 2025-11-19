@@ -51,6 +51,8 @@ typedef struct s_ip {
 	double		max;
 	t_socket	socket;
 	int			last;
+	double		sum_rtt;
+	double		sum_rtt_square;
 
 } t_ip;
 

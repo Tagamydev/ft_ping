@@ -48,3 +48,7 @@ PING 192.168.0.1 (192.168.0.1): 56 data bytes
 ^C--- 192.168.0.1 ping statistics ---
 6 packets transmitted, 0 packets received, 100% packet loss
 
+
+-----------------------------------------------------------------------------------
+
+stddev

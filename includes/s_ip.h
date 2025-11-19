@@ -50,6 +50,7 @@ typedef struct s_ip {
 	double		avg;
 	double		max;
 	t_socket	socket;
+	int			last;
 
 } t_ip;
 

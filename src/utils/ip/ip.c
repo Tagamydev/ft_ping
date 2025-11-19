@@ -73,5 +73,7 @@ t_ip	*new_ip(char *ip)
 		return (free_ip(result));
 	}
 
+	result->last = -1;
+
 	return (result);
 }

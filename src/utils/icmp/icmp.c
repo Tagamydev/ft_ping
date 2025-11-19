@@ -101,10 +101,13 @@ static int handle_echo_reply(char *recvbuf, int ip_hdr_len, struct sockaddr_in *
     printf("%d bytes from %s: icmp_seq=%d ttl=%d time=%d.%03d ms",
            recvd, addrstr, actual_seq, received_ttl, rtt_int, rtt_frac);    
 
-    if (actual_seq != seq)
+    if (actual_seq == ip->last)
         printf(" (DUP!)\n");
     else
+    {
         printf("\n");
+        ip->last = actual_seq;
+    }
 
     if (rtt < ip->min)
         ip->min = rtt;

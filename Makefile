@@ -26,7 +26,7 @@ SUBMODLIB	= ./libft/libft.a
 # GCC WITH LIBS AND INCLUDES
 CFLAGS		= -fsanitize=address
 CFLAGS	   +=# -Wall -Wextra -Werror
-CC			= gcc $(CFLAGS) $(INC)
+CC			= gcc $(CFLAGS) $(INC) -lm
 
 #================================= SCRS =================================#
 

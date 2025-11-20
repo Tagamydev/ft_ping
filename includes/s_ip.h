@@ -53,6 +53,7 @@ typedef struct s_ip {
 	int			last;
 	double		sum_rtt;
 	double		sum_rtt_square;
+	size_t		dups;
 
 } t_ip;
 

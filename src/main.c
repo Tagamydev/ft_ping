@@ -52,7 +52,7 @@ void	print_ping_result(t_ip *ip)
 
 	printf("%zu packets transmitted, %zu packets received", ip->packets_transmitted, ip->packets_received);
 	if (!(total >= 0))
-		printf(", +%d duplicates", dup);
+		printf(", +%d duplicates", ip->dups);
 	printf(", %.0f%% packet loss\n", loss);
 	if (ip->packets_received)
 		print_round_trip(ip);
@@ -71,10 +71,6 @@ static void wait_while_recv(int i, t_ip *ip)
 		once = 1;
 	}
 
-	if (ping->flags.w)
-	{
-
-	}
 	time_t start_time = time(NULL);
 	time_t current_time;
 	double elapsed_time;
@@ -82,6 +78,16 @@ static void wait_while_recv(int i, t_ip *ip)
 	do {
 		recv_icmp(i, ip);
 		current_time = time(NULL);
+		elapsed_time = difftime(current_time, start_time);
+		if (ping->flags.w)
+		{
+			elapsed_time = difftime(current_time, super_start);
+			if ((size_t)elapsed_time >= ping->flags.deadline)
+			{
+				ping->alive = 0;
+				break ;
+			}
+		}
 		elapsed_time = difftime(current_time, start_time);
 	} while (elapsed_time < ping->flags.interval);
 }

@@ -102,7 +102,10 @@ static int handle_echo_reply(char *recvbuf, int ip_hdr_len, struct sockaddr_in *
            recvd, addrstr, actual_seq, received_ttl, rtt_int, rtt_frac);    
 
     if (actual_seq == ip->last)
+    {
+        ip->dups += 1;
         printf(" (DUP!)\n");
+    }
     else
     {
         printf("\n");

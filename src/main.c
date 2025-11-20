@@ -6,7 +6,7 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:18:02 by samusanc          #+#    #+#             */
-/*   Updated: 2025/11/20 13:34:25 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/11/20 15:35:25 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	print_ping_result(t_ip *ip)
 
 	printf("--- %s ping statistics ---\n", ip->ip);
 	if (ip->packets_transmitted == 0) {
-		printf("0 packets transmitted, 0 packets received, 100%% packet loss\n");
+		printf("1 packets transmitted, 0 packets received, 100%% packet loss\n");
 		return;
 	}
 	double loss = 0;
@@ -62,6 +62,19 @@ void	print_ping_result(t_ip *ip)
 // here i need a function that keep waiting until it reach 1 second 
 static void wait_while_recv(int i, t_ip *ip)
 {
+	static	time_t	super_start;
+	static	int		once = 0;
+
+	if (!once)
+	{
+		super_start = time(NULL);
+		once = 1;
+	}
+
+	if (ping->flags.w)
+	{
+
+	}
 	time_t start_time = time(NULL);
 	time_t current_time;
 	double elapsed_time;

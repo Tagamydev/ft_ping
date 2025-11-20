@@ -6,7 +6,7 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:18:02 by samusanc          #+#    #+#             */
-/*   Updated: 2025/05/26 17:43:49 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/11/20 09:11:49 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,12 @@ int	ft_ping(t_node *new_ipv4)
 		send_icmp(i, ip);
 		wait_while_recv(i, ip);
 		i++;
+		printf("this are the flags:%d\n", ping->flags.c);
+		if (ping->flags.c)
+		{
+			if (i >= ping->flags.number)
+				break ;
+		}
 	}
 	// need a revision?
 	print_ping_result(ip);
@@ -111,6 +117,12 @@ void handle_signal(int sig)
 
 int	main(int argc, char **argv)
 {
+	if (argc == 1)
+	{
+		write(2, "ping: missing host operand\nTry 'ping --help' or 'ping --usage' for more information.\n", 85);
+		return (64);
+	}
+
 	//send_icmp();
 	argv++;
 	int		error;

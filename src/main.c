@@ -6,7 +6,7 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:18:02 by samusanc          #+#    #+#             */
-/*   Updated: 2025/11/20 09:11:49 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/11/20 13:34:25 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,10 +67,10 @@ static void wait_while_recv(int i, t_ip *ip)
 	double elapsed_time;
 
 	do {
-	recv_icmp(i, ip);
-	current_time = time(NULL);
-	elapsed_time = difftime(current_time, start_time);
-	} while (elapsed_time < 1.0);
+		recv_icmp(i, ip);
+		current_time = time(NULL);
+		elapsed_time = difftime(current_time, start_time);
+	} while (elapsed_time < ping->flags.interval);
 }
 
 int	ft_ping(t_node *new_ipv4)
@@ -94,7 +94,6 @@ int	ft_ping(t_node *new_ipv4)
 		send_icmp(i, ip);
 		wait_while_recv(i, ip);
 		i++;
-		printf("this are the flags:%d\n", ping->flags.c);
 		if (ping->flags.c)
 		{
 			if (i >= ping->flags.number)

@@ -6,7 +6,7 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 02:00:49 by samusanc          #+#    #+#             */
-/*   Updated: 2025/05/26 17:29:26 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/11/20 13:30:44 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,6 +151,7 @@ void *parse_flags(char **argv, t_ping *result)
     int i = 0;
     int waiting_for_value = 0;  // Track if we're expecting a value for a flag
     char pending_flag = 0;       // Which flag is waiting for a value
+	result->flags.interval = 1.0;
     
     while (argv[i] && !result->flags.error)
     {

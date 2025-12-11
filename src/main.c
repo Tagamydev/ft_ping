@@ -102,8 +102,14 @@ int	ft_ping(t_node *new_ipv4)
 	double	total = 0.0f;
 	size_t	i = 0;
 
-	printf("PING %s (%s): 56 data bytes\n", ip->ip, ip->solved);
-	printf("number:%d, flag:%d\n", ping->flags.number, ping->flags.c);
+	printf("PING %s (%s): 56 data bytes", ip->ip, ip->solved);
+	if (ping->flags.v)
+	{
+		uint16_t id = getpid() & 0xFFFF;
+		printf(", id = 0x%04x = %d\n", id, id);
+	}
+	pintf("\n");
+	//printf("number:%d, flag:%d\n", ping->flags.number, ping->flags.c);
 	while(1)
 	{
 		if (!ping->alive)

@@ -104,6 +104,7 @@ int	ft_ping(t_node *new_ipv4)
 
 	printf("PING %s (%s): 56 data bytes\n", ip->ip, ip->solved);
 	// this while 1 need to be changed to c
+	printf("number:%f, flag:%f\n", ping->flags.number, ping->flags.c);
 	while(1)
 	{
 		if (!ping->alive)

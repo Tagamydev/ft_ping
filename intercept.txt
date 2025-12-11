@@ -1,1 +1,0 @@
-sudo tcpdump ip proto \\icmp -i lo

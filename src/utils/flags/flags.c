@@ -116,8 +116,7 @@ int parse_flag_value(t_flags *flags, char flag, char *value)
             break;
 
         case 'W':
-            // -W accepts float values (in seconds)
-            if (!check_float(value))
+            if (!check_number(value))
             {
                 fprintf(stderr, "ft_ping: invalid timeout: %s\n", value);
                 return (-1);

@@ -145,13 +145,13 @@ int parse_flag_value(t_flags *flags, char flag, char *value)
             // -i accepts float values (in seconds)
             if (!check_float(value))
             {
-                fprintf(stderr, "ft_ping: invalid interval: %s\n", value);
+                fprintf(stderr, "ft_ping: invalid interval2: %s\n", value);
                 return (-1);
             }
             flags->interval = atof(value);
             if (flags->interval <= 0.0)
             {
-                fprintf(stderr, "ft_ping: invalid interval: %s\n", value);
+                fprintf(stderr, "ft_ping: invalid interval3: %s\n", value);
                 return (-1);
             }
             break;

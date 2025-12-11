@@ -71,7 +71,7 @@ static void wait_while_recv(int i, t_ip *ip, double interval_start, double super
 	double current_time;
 	double elapsed_from_start;
 	double elapsed_from_interval;
-	double packet_timeout = ping->flags.W ? ping->flags.timeout : ping->flags.interval;
+	double packet_timeout = ping->flags.w ? ping->flags.timeout : ping->flags.interval;
 	double timeout_deadline = interval_start + packet_timeout;
 
 	do {
@@ -145,8 +145,6 @@ int	ft_ping(t_node *new_ipv4)
 		if (ping->flags.c && i >= ping->flags.number)
 			break;
 		
-		// Sleep for any remaining time in the interval period
-		// (if response came back quickly)
 		sleep_remaining_interval(interval_start);
 	}
 	

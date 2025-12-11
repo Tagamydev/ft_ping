@@ -59,7 +59,6 @@ void	print_ping_result(t_ip *ip)
 }
 
 
-// here i need a function that keep waiting until it reach 1 second 
 static void wait_while_recv(int i, t_ip *ip)
 {
 	static	time_t	super_start;
@@ -109,12 +108,10 @@ int	ft_ping(t_node *new_ipv4)
 		printf(", id = 0x%04x = %d", id, id);
 	}
 	printf("\n");
-	//printf("number:%d, flag:%d\n", ping->flags.number, ping->flags.c);
 	while(1)
 	{
 		if (!ping->alive)
 			break ;
-		// update icmp package
 		update_icmp(i, ip);
 		send_icmp(i, ip);
 		wait_while_recv(i, ip);
@@ -125,7 +122,6 @@ int	ft_ping(t_node *new_ipv4)
 				break ;
 		}
 	}
-	// need a revision?
 	print_ping_result(ip);
 	return 0;
 }
@@ -147,7 +143,6 @@ int	main(int argc, char **argv)
 		return (64);
 	}
 
-	//send_icmp();
 	argv++;
 	int		error;
 	struct	sigaction sa;

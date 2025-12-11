@@ -17,7 +17,7 @@
 #define RECV_BUF 1500
 #define TIMEOUT_SEC 1
 
-uint16_t icmp_checksum(void *buf, int len); // your checksum function
+uint16_t icmp_checksum(void *buf, int len);
 
 int main(int argc, char **argv) {
     if (argc != 2) { fprintf(stderr, "usage: %s <dest-ip>\n", argv[0]); exit(1); }
@@ -30,7 +30,6 @@ int main(int argc, char **argv) {
     int sock = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
     if (sock < 0) { perror("socket"); exit(1); }
 
-    // set receive timeout
     struct timeval tv = { .tv_sec = TIMEOUT_SEC, .tv_usec = 0 };
     setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 
@@ -38,13 +37,11 @@ int main(int argc, char **argv) {
     uint16_t seq = 0;
 
     for (int ttl = 1; ttl <= MAXHOPS; ++ttl) {
-        // set TTL for this probe
         if (setsockopt(sock, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl)) < 0) {
             perror("setsockopt(IP_TTL)");
             break;
         }
 
-        // build ICMP echo request
         char sendbuf[PACKET_SIZE];
         memset(sendbuf, 0, PACKET_SIZE);
         struct icmphdr *icmp = (struct icmphdr *)sendbuf;
@@ -53,19 +50,16 @@ int main(int argc, char **argv) {
         icmp->un.echo.id = htons(pid);
 
         icmp->un.echo.sequence = htons(seq++);
-        // optional payload / timestamp
         struct timeval t1;
         gettimeofday(&t1, NULL);
         memcpy(sendbuf + sizeof(struct icmphdr), &t1, sizeof(t1));
         icmp->checksum = 0;
         icmp->checksum = icmp_checksum((void*)icmp, PACKET_SIZE);
 
-        // send
         ssize_t sent = sendto(sock, sendbuf, PACKET_SIZE, 0,
                               (struct sockaddr*)&dest_addr, sizeof(dest_addr));
         if (sent < 0) { perror("sendto"); continue; }
 
-        // receive
         char recvbuf[RECV_BUF];
         struct sockaddr_in from;
         socklen_t fromlen = sizeof(from);
@@ -73,7 +67,7 @@ int main(int argc, char **argv) {
                                  (struct sockaddr*)&from, &fromlen);
         if (recvd < 0) {
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                printf("%2d  *\n", ttl); // timeout
+                printf("%2d  *\n", ttl);
                 continue;
             } else {
                 perror("recvfrom");
@@ -89,28 +83,22 @@ int main(int argc, char **argv) {
         struct icmphdr *outer_icmp = (struct icmphdr *)(recvbuf + ip_hdr_len);
 
         if (outer_icmp->type == ICMP_TIME_EXCEEDED) {
-            // router tells us TTL expired; inside is original IP + 8 bytes of original payload
-            // inner IP begins after outer ICMP header
             char *inner = recvbuf + ip_hdr_len + sizeof(struct icmphdr);
             struct ip *inner_ip = (struct ip *)inner;
             int inner_ip_len = inner_ip->ip_hl * 4;
             struct icmphdr *inner_icmp = (struct icmphdr *)(inner + inner_ip_len);
 
-            // check id/seq match
             if (ntohs(inner_icmp->un.echo.id) == pid) {
                 char addrstr[INET_ADDRSTRLEN];
                 inet_ntop(AF_INET, &from.sin_addr, addrstr, sizeof(addrstr));
                 printf("%2d  %s  (type=11)\n", ttl, addrstr);
             } else {
-                // not our probe; ignore or handle
                 printf("%2d  %s  (time-exceeded, not matching id)\n", ttl, inet_ntoa(from.sin_addr));
             }
         } else if (outer_icmp->type == ICMP_ECHOREPLY) {
-            // destination replied
             char addrstr[INET_ADDRSTRLEN];
             inet_ntop(AF_INET, &from.sin_addr, addrstr, sizeof(addrstr));
 
-            // compute RTT if you stored timestamp in payload
             struct timeval t2;
             gettimeofday(&t2, NULL);
             struct timeval tsent;
@@ -118,9 +106,8 @@ int main(int argc, char **argv) {
             double rtt = (t2.tv_sec - tsent.tv_sec) * 1000.0 + (t2.tv_usec - tsent.tv_usec) / 1000.0;
 
             printf("%2d  %s  (echo-reply)  RTT=%.3f ms\n", ttl, addrstr, rtt);
-            break; // done
+            break;
         } else {
-            // other ICMP types (dest unreachable, etc)
             printf("%2d  %s  (ICMP type %d code %d)\n", ttl,
                    inet_ntoa(from.sin_addr), outer_icmp->type, outer_icmp->code);
         }
@@ -130,7 +117,6 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-// add your checksum function here (the one you asked about earlier)
 uint16_t icmp_checksum(void *buf, int len) {
     uint32_t sum = 0;
     uint16_t *data = buf;

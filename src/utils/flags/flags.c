@@ -161,7 +161,6 @@ int parse_flag_value(t_flags *flags, char flag, char *value)
     return (0);
 }
 
-// Process individual flags from a flag group (e.g., -vvq)
 int process_flag_char(t_flags *flags, char flag)
 {
     switch (flag)
@@ -170,7 +169,7 @@ int process_flag_char(t_flags *flags, char flag)
             flags->q = 1;
             break;
         case 'v':
-            flags->v++;  // Can be incremented multiple times (-vv, -vvv)
+            flags->v++;
             break;
         case 'h':
             flags->help = 1;
@@ -186,16 +185,15 @@ int process_flag_char(t_flags *flags, char flag)
 void *parse_flags(char **argv, t_ping *result)
 {
     int i = 0;
-    int waiting_for_value = 0;  // Track if we're expecting a value for a flag
-    char pending_flag = 0;       // Which flag is waiting for a value
-    result->flags.interval = 1.0;  // Default 1 second interval
-    result->flags.timeout = 10.0;   // Default 10 second timeout (like standard ping)
+    int waiting_for_value = 0;
+    char pending_flag = 0;
+    result->flags.interval = 1.0;
+    result->flags.timeout = 10.0;
     
     while (argv[i] && !result->flags.error)
     {
         char *arg = argv[i];
         
-        // If we're waiting for a value from previous iteration
         if (waiting_for_value)
         {
             if (parse_flag_value(&result->flags, pending_flag, arg) < 0)
@@ -204,7 +202,6 @@ void *parse_flags(char **argv, t_ping *result)
                 return (result);
             }
             
-            // Set the flag as active
             switch (pending_flag)
             {
                 case 'c': result->flags.c = 1; break;
@@ -220,7 +217,6 @@ void *parse_flags(char **argv, t_ping *result)
             continue;
         }
         
-        // Not a flag - must be an IP/hostname
         if (arg[0] != '-' || strlen(arg) < 2)
         {
             t_ip *ip = new_ip(arg);
@@ -234,11 +230,9 @@ void *parse_flags(char **argv, t_ping *result)
             continue;
         }
 
-        // Handle "--" (end of flags)
         if (strcmp(arg, "--") == 0)
         {
             i++;
-            // Remaining args are IPs
             while (argv[i])
             {
                 t_ip *ip = new_ip(argv[i]);
@@ -253,20 +247,17 @@ void *parse_flags(char **argv, t_ping *result)
             break;
         }
 
-        // Process flags starting with '-'
         for (int j = 1; arg[j]; j++)
         {
             char flag = arg[j];
             
-            // Flag that needs a value
             if (flag_needs_value(flag))
             {
-                // Value can be: -c100 or -c 100
                 char *value = NULL;
                 
-                if (arg[j + 1])  // Value in same arg: -c100
+                if (arg[j + 1])
                     value = &arg[j + 1];
-                else if (argv[i + 1])  // Value in next arg: -c 100
+                else if (argv[i + 1])
                 {
                     value = argv[i + 1];
                     i++;
@@ -278,7 +269,6 @@ void *parse_flags(char **argv, t_ping *result)
                     return (result);
                 }
                 
-                // Set the flag as active
                 switch (flag)
                 {
                     case 'c': result->flags.c = 1; break;
@@ -288,11 +278,10 @@ void *parse_flags(char **argv, t_ping *result)
                     case 'i': result->flags.i = 1; break;
                 }
                 
-                break;  // Value flags can't be combined with others
+                break;
             }
             else
             {
-                // No-value flag (can be combined: -vvq)
                 if (process_flag_char(&result->flags, flag) < 0)
                 {
                     result->flags.error = 1;

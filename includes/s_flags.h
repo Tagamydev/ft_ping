@@ -31,41 +31,19 @@
 
 typedef struct s_flags{
 
-/*-c (count)
-Stop sending pings after N requests.
-→ Just use a counter. Easy logic around loop iteration.*/
 	int		c;
 	size_t	number;
-
-/*-w (deadline)
-Exit after N seconds, regardless of how many pings sent.
-→ Track elapsed time with gettimeofday() or clock_gettime().*/
 	int		w;
 	size_t	deadline;
-
-/*-W (timeout for reply)
-Timeout for each reply (how long to wait for a response).
-→ Set recvfrom() timeout with setsockopt() using SO_RCVTIMEO.*/
 	int W;
 	int	timeout;
-
-/* You may specify up to 16 "pad" bytes to fill out the packet you send.  This is useful for diagnosing data-dependent problems in a network.  For exam‐
- ple, “-p ff” will cause the sent packet to be filled with all ones.*/
 	int	p;
-	// how can i verify this???
 	char	*pad;
-
-
-// yeahhhhhhhhhhhhhhhh
 	int q;
-
-	//?
 	int i;
 	float	interval;
-
 	int v;
 	int help;
-
 	int	total;
 	int	error;
 } t_flags;

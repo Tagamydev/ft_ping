@@ -6,13 +6,12 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:18:02 by samusanc          #+#    #+#             */
-/*   Updated: 2025/12/11 20:00:00 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/11/20 15:35:25 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ping.h"
 #include <math.h>
-#include <sys/time.h>
 
 t_ping *ping = NULL;
 
@@ -59,64 +58,49 @@ void	print_ping_result(t_ip *ip)
 		print_round_trip(ip);
 }
 
-static double get_time_seconds(void)
-{
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	return tv.tv_sec + tv.tv_usec / 1000000.0;
-}
 
-static void wait_while_recv(int i, t_ip *ip, double interval_start, double super_start)
+// here i need a function that keep waiting until it reach 1 second 
+static void wait_while_recv(int i, t_ip *ip)
 {
-	double current_time;
-	double elapsed_from_start;
-	double elapsed_from_interval;
-	double packet_timeout = ping->flags.w ? ping->flags.timeout : ping->flags.interval;
-	double timeout_deadline = interval_start + packet_timeout;
+	static	time_t	super_start;
+	static	int		once = 0;
+
+	if (!once)
+	{
+		super_start = time(NULL);
+		once = 1;
+	}
+
+	time_t start_time = time(NULL);
+	time_t current_time;
+	double elapsed_time;
 
 	do {
 		recv_icmp(i, ip);
-		current_time = get_time_seconds();
-		
-		if (ping->flags.W)
+		current_time = time(NULL);
+		elapsed_time = difftime(current_time, start_time);
+		if (ping->flags.w)
 		{
-			elapsed_from_start = current_time - super_start;
-			if (elapsed_from_start >= (double)ping->flags.deadline)
+			elapsed_time = difftime(current_time, super_start);
+			if ((size_t)elapsed_time >= ping->flags.deadline)
 			{
 				ping->alive = 0;
-				return;
+				break ;
 			}
 		}
-		
-		if (ping->flags.w && current_time >= timeout_deadline)
-		{
-			break;
-		}
-		elapsed_from_interval = current_time - interval_start;
-		
-	} while (elapsed_from_interval < ping->flags.interval);
-}
-
-static void sleep_remaining_interval(double interval_start)
-{
-	double current_time = get_time_seconds();
-	double elapsed = current_time - interval_start;
-	double remaining = ping->flags.interval - elapsed;
-	
-	if (remaining > 0)
-	{
-		usleep((useconds_t)(remaining * 1000000));
-	}
+		elapsed_time = difftime(current_time, start_time);
+	} while (elapsed_time < ping->flags.interval);
 }
 
 int	ft_ping(t_node *new_ipv4)
 {
 	if (!new_ipv4)
 		return 0;
-	
 	t_ip	*ip = (t_ip *)new_ipv4->content;
+	double	min = 0.0f;
+	double	max = 0.0f;
+	double	total = 0.0f;
 	size_t	i = 0;
-	double	super_start = get_time_seconds();
 
 	printf("PING %s (%s): 56 data bytes", ip->ip, ip->solved);
 	if (ping->flags.v)
@@ -124,30 +108,24 @@ int	ft_ping(t_node *new_ipv4)
 		uint16_t id = getpid() & 0xFFFF;
 		printf(", id = 0x%04x = %d", id, id);
 	}
-	printf("\n");
-	
+	pintf("\n");
+	//printf("number:%d, flag:%d\n", ping->flags.number, ping->flags.c);
 	while(1)
 	{
 		if (!ping->alive)
-			break;
-		
-		double interval_start = get_time_seconds();
+			break ;
+		// update icmp package
 		update_icmp(i, ip);
 		send_icmp(i, ip);
-		wait_while_recv(i, ip, interval_start, super_start);
-		
-		if (!ping->alive)
-			break;
-		
+		wait_while_recv(i, ip);
 		i++;
-		
-		// Check if we've reached the packet count limit (-c flag)
-		if (ping->flags.c && i >= ping->flags.number)
-			break;
-		
-		sleep_remaining_interval(interval_start);
+		if (ping->flags.c)
+		{
+			if (i >= ping->flags.number)
+				break ;
+		}
 	}
-	
+	// need a revision?
 	print_ping_result(ip);
 	return 0;
 }
@@ -169,6 +147,7 @@ int	main(int argc, char **argv)
 		return (64);
 	}
 
+	//send_icmp();
 	argv++;
 	int		error;
 	struct	sigaction sa;
@@ -181,7 +160,6 @@ int	main(int argc, char **argv)
 	ping = init_ping(argv);
 	if (!ping)
 		return (-1);
-	
 	t_node	*tmp = ping->ips.head;
 	for (size_t i = 0; i < ping->ips.size; i++) {
 		ft_ping(tmp);

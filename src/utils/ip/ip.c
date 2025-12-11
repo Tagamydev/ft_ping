@@ -1,5 +1,8 @@
 #include "ft_ping.h"
 
+
+#define TIMEOUT_SEC 1
+
 void	*free_ip(void *ptr)
 {
 	t_ip	*cast = (t_ip *)ptr;
@@ -12,29 +15,6 @@ void	*free_ip(void *ptr)
 	free(cast->solved);
 	free(cast);
 	return (NULL);
-}
-
-/**
- * Configure socket timeout based on flags
- * 
- * The timeout determines how long recvfrom() will block waiting for data.
- * We want a short timeout so we can check deadlines frequently.
- */
-static int configure_socket_timeout(int sockfd, t_ping *ping)
-{
-	struct timeval tv;
-	
-	// Use a short timeout (100ms) so we can check deadlines frequently
-	// The actual response timeout is handled in wait_while_recv()
-	tv.tv_sec = 0;
-	tv.tv_usec = 100000;  // 100ms
-	
-	if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
-		perror("ft_ping: error setting socket timeout");
-		return -1;
-	}
-	
-	return 0;
 }
 
 t_ip	*new_ip(char *ip)
@@ -75,8 +55,11 @@ t_ip	*new_ip(char *ip)
 		return (free_ip(result));
 	}
 
+
 	// Configure socket timeout
-	if (configure_socket_timeout(result->socket.socket, ping) < 0) {
+	struct timeval tv = { .tv_sec = TIMEOUT_SEC, .tv_usec = 0 };
+	if (setsockopt(result->socket.socket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
+		perror("ft_ping: error setting timeout");
 		return (free_ip(result));
 	}
 
@@ -91,9 +74,6 @@ t_ip	*new_ip(char *ip)
 	}
 
 	result->last = -1;
-	result->min = 999999.0;  // Initialize min to a large value
-	result->max = 0.0;
-	result->avg = 0.0;
 
 	return (result);
 }

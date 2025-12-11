@@ -47,7 +47,7 @@ Exit after N seconds, regardless of how many pings sent.
 Timeout for each reply (how long to wait for a response).
 → Set recvfrom() timeout with setsockopt() using SO_RCVTIMEO.*/
 	int W;
-	int	timeout;
+	size_t	timeout;
 
 /* You may specify up to 16 "pad" bytes to fill out the packet you send.  This is useful for diagnosing data-dependent problems in a network.  For exam‐
  ple, “-p ff” will cause the sent packet to be filled with all ones.*/
@@ -61,7 +61,7 @@ Timeout for each reply (how long to wait for a response).
 
 	//?
 	int i;
-	float	interval;
+	int	interval;
 
 	int v;
 	int help;

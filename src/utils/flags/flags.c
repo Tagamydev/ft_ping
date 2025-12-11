@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "ft_ping.h"
+#include <stdlib.h>  // For atof() and atoll()
 
 // Check if string contains only digits
 int check_number(char *str)

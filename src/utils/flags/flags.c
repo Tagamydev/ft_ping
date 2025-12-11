@@ -6,7 +6,7 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 02:00:49 by samusanc          #+#    #+#             */
-/*   Updated: 2025/11/20 13:30:44 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/12/11 20:00:00 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,36 @@ int check_number(char *str)
         if (str[i] < '0' || str[i] > '9')
             return (0);
     return (1);
+}
+
+// Check if string is a valid float (for interval and timeout)
+int check_float(char *str)
+{
+    if (!str || !str[0])
+        return (0);
+    
+    int has_dot = 0;
+    int has_digit = 0;
+    
+    for (int i = 0; str[i]; i++)
+    {
+        if (str[i] == '.')
+        {
+            if (has_dot)  // Second dot found
+                return (0);
+            has_dot = 1;
+        }
+        else if (str[i] >= '0' && str[i] <= '9')
+        {
+            has_digit = 1;
+        }
+        else
+        {
+            return (0);  // Invalid character
+        }
+    }
+    
+    return has_digit;  // Must have at least one digit
 }
 
 // Check if string contains only hexadecimal digits
@@ -77,16 +107,22 @@ int parse_flag_value(t_flags *flags, char flag, char *value)
                 return (-1);
             }
             flags->deadline = atoll(value);
+            if (flags->deadline == 0)
+            {
+                fprintf(stderr, "ft_ping: invalid deadline: %s\n", value);
+                return (-1);
+            }
             break;
 
         case 'W':
-            if (!check_number(value))
+            // -W accepts float values (in seconds)
+            if (!check_float(value))
             {
                 fprintf(stderr, "ft_ping: invalid timeout: %s\n", value);
                 return (-1);
             }
-            flags->timeout = atoll(value);
-            if (flags->timeout == 0)
+            flags->timeout = atof(value);
+            if (flags->timeout <= 0.0)
             {
                 fprintf(stderr, "ft_ping: invalid timeout: %s\n", value);
                 return (-1);
@@ -105,13 +141,14 @@ int parse_flag_value(t_flags *flags, char flag, char *value)
             break;
 
         case 'i':
-            if (!check_number(value))
+            // -i accepts float values (in seconds)
+            if (!check_float(value))
             {
                 fprintf(stderr, "ft_ping: invalid interval: %s\n", value);
                 return (-1);
             }
-            flags->interval = atoi(value);
-            if (flags->interval == 0)
+            flags->interval = atof(value);
+            if (flags->interval <= 0.0)
             {
                 fprintf(stderr, "ft_ping: invalid interval: %s\n", value);
                 return (-1);
@@ -151,7 +188,8 @@ void *parse_flags(char **argv, t_ping *result)
     int i = 0;
     int waiting_for_value = 0;  // Track if we're expecting a value for a flag
     char pending_flag = 0;       // Which flag is waiting for a value
-	result->flags.interval = 1.0;
+    result->flags.interval = 1.0;  // Default 1 second interval
+    result->flags.timeout = 10.0;   // Default 10 second timeout (like standard ping)
     
     while (argv[i] && !result->flags.error)
     {

@@ -6,12 +6,13 @@
 /*   By: samusanc <samusanc@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 08:18:02 by samusanc          #+#    #+#             */
-/*   Updated: 2025/11/20 15:35:25 by samusanc         ###   ########.fr       */
+/*   Updated: 2025/12/11 20:00:00 by samusanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ping.h"
 #include <math.h>
+#include <sys/time.h>
 
 t_ping *ping = NULL;
 
@@ -58,49 +59,92 @@ void	print_ping_result(t_ip *ip)
 		print_round_trip(ip);
 }
 
-
-// here i need a function that keep waiting until it reach 1 second 
-static void wait_while_recv(int i, t_ip *ip)
+/**
+ * Get time in seconds with microsecond precision
+ */
+static double get_time_seconds(void)
 {
-	static	time_t	super_start;
-	static	int		once = 0;
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return tv.tv_sec + tv.tv_usec / 1000000.0;
+}
 
-	if (!once)
-	{
-		super_start = time(NULL);
-		once = 1;
-	}
-
-	time_t start_time = time(NULL);
-	time_t current_time;
-	double elapsed_time;
+/**
+ * Wait and receive responses for one ping cycle
+ * 
+ * This function:
+ * 1. Waits for responses during the interval period (-i flag)
+ * 2. Respects the per-packet timeout (-W flag)
+ * 3. Checks the global deadline (-w flag)
+ */
+static void wait_while_recv(int i, t_ip *ip, double interval_start, double super_start)
+{
+	double current_time;
+	double elapsed_from_start;
+	double elapsed_from_interval;
+	
+	// How long should we wait for THIS packet's response?
+	// Use -W timeout if specified, otherwise use the interval time
+	double packet_timeout = ping->flags.W ? ping->flags.timeout : ping->flags.interval;
+	double timeout_deadline = interval_start + packet_timeout;
 
 	do {
+		// Try to receive (non-blocking due to socket timeout)
 		recv_icmp(i, ip);
-		current_time = time(NULL);
-		elapsed_time = difftime(current_time, start_time);
+		
+		current_time = get_time_seconds();
+		
+		// Check global deadline (-w flag)
 		if (ping->flags.w)
 		{
-			elapsed_time = difftime(current_time, super_start);
-			if ((size_t)elapsed_time >= ping->flags.deadline)
+			elapsed_from_start = current_time - super_start;
+			if (elapsed_from_start >= (double)ping->flags.deadline)
 			{
 				ping->alive = 0;
-				break ;
+				return;
 			}
 		}
-		elapsed_time = difftime(current_time, start_time);
-	} while (elapsed_time < ping->flags.interval);
+		
+		// Check if we've exceeded the timeout for this specific packet (-W flag)
+		if (ping->flags.W && current_time >= timeout_deadline)
+		{
+			// Timeout reached for this packet, move on
+			break;
+		}
+		
+		// Check if we've completed the interval period
+		elapsed_from_interval = current_time - interval_start;
+		
+	} while (elapsed_from_interval < ping->flags.interval);
+}
+
+/**
+ * Sleep for remaining time in interval
+ * 
+ * If we received a response quickly, we need to sleep for the rest
+ * of the interval period before sending the next packet
+ */
+static void sleep_remaining_interval(double interval_start)
+{
+	double current_time = get_time_seconds();
+	double elapsed = current_time - interval_start;
+	double remaining = ping->flags.interval - elapsed;
+	
+	if (remaining > 0)
+	{
+		// Convert to microseconds for usleep
+		usleep((useconds_t)(remaining * 1000000));
+	}
 }
 
 int	ft_ping(t_node *new_ipv4)
 {
 	if (!new_ipv4)
 		return 0;
+	
 	t_ip	*ip = (t_ip *)new_ipv4->content;
-	double	min = 0.0f;
-	double	max = 0.0f;
-	double	total = 0.0f;
 	size_t	i = 0;
+	double	super_start = get_time_seconds();  // Start time for -w deadline
 
 	printf("PING %s (%s): 56 data bytes", ip->ip, ip->solved);
 	if (ping->flags.v)
@@ -108,24 +152,37 @@ int	ft_ping(t_node *new_ipv4)
 		uint16_t id = getpid() & 0xFFFF;
 		printf(", id = 0x%04x = %d", id, id);
 	}
-	pintf("\n");
-	//printf("number:%d, flag:%d\n", ping->flags.number, ping->flags.c);
+	printf("\n");
+	
 	while(1)
 	{
 		if (!ping->alive)
-			break ;
-		// update icmp package
+			break;
+		
+		// Record when we start this ping cycle
+		double interval_start = get_time_seconds();
+		
+		// Update and send ICMP packet
 		update_icmp(i, ip);
 		send_icmp(i, ip);
-		wait_while_recv(i, ip);
+		
+		// Wait for responses (handles -W timeout and -w deadline)
+		wait_while_recv(i, ip, interval_start, super_start);
+		
+		if (!ping->alive)
+			break;
+		
 		i++;
-		if (ping->flags.c)
-		{
-			if (i >= ping->flags.number)
-				break ;
-		}
+		
+		// Check if we've reached the packet count limit (-c flag)
+		if (ping->flags.c && i >= ping->flags.number)
+			break;
+		
+		// Sleep for any remaining time in the interval period
+		// (if response came back quickly)
+		sleep_remaining_interval(interval_start);
 	}
-	// need a revision?
+	
 	print_ping_result(ip);
 	return 0;
 }
@@ -147,7 +204,6 @@ int	main(int argc, char **argv)
 		return (64);
 	}
 
-	//send_icmp();
 	argv++;
 	int		error;
 	struct	sigaction sa;
@@ -160,6 +216,7 @@ int	main(int argc, char **argv)
 	ping = init_ping(argv);
 	if (!ping)
 		return (-1);
+	
 	t_node	*tmp = ping->ips.head;
 	for (size_t i = 0; i < ping->ips.size; i++) {
 		ft_ping(tmp);

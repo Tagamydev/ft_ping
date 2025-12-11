@@ -108,7 +108,7 @@ int	ft_ping(t_node *new_ipv4)
 		uint16_t id = getpid() & 0xFFFF;
 		printf(", id = 0x%04x = %d", id, id);
 	}
-	pintf("\n");
+	printf("\n");
 	//printf("number:%d, flag:%d\n", ping->flags.number, ping->flags.c);
 	while(1)
 	{

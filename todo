@@ -3,3 +3,4 @@ flag q
 error messages
 sudo ./ft_ping 10.0.0.101 -v -c -2
 delete address sanitizer from makefile
+comments in flags
